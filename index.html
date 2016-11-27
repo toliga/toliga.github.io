@@ -1,0 +1,233 @@
+<title>Toliga</title>
+<script src="https://cdn.firebase.com/js/client/2.2.1/firebase.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<div class="wrapper">
+  <h1>Toliga</h1>
+  <div class="messagesWrap">
+  <ul class="messages"></ul>
+</div>
+<form action="" class="chat">
+  <input type='text' id='nameInput' placeholder='Name' required > 
+  <input type='text' id='messageInput'  placeholder='Type a message...' required>
+  <input type="submit" value="Send">
+</form>
+<p><a href="javascript:loadImages();">Images not loading?</a></p>
+<div class="text-align: center;" style="margin-top:300px;">
+  <hr>
+  <p style="font-size: 10px">Advertisement</p>
+  <iframe data-aa='275812' src='//ad.a-ads.com/275812?size=728x90&title_color=1eae13&link_color=1eae13&title_hover_color=1eae13&link_hover_color=1eae13&text_color=111111' scrolling='no' style='width:728px; height:90px; border:0px; padding:0;overflow:hidden' allowtransparency='true'></iframe>
+</div>
+</div>
+<script>var messagesRef = new Firebase('https://toliga-ea118.firebaseio.com');</script>
+<script>
+  //Add a header
+  document.body.innerHTML='<ul id="nav"><a href="//toliga.github.io/"><li>Toliga</li></a></ul>'+document.body.innerHTML;
+//Random string
+function makeID()
+{
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for( var i=0; i < 10; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text;
+}
+var session=makeID();
+  // C.R.E.A.M -  cache your elements
+  var messageField = $('#messageInput');
+  var nameField = $('#nameInput');
+  var messageList = $('.messages');
+  function addMessage(data) {
+    var username = data.name || 'anonymous';
+    var message = data.text;
+    // Create an element
+    var nameElement = $('<strong>').text(username);
+    var messageElement = $('<li>').text(message).prepend(nameElement);
+    // Add the message to the DOM
+    messageList.append(messageElement);
+    // Scroll to the bottom of the message list
+    messageList[0].scrollTop = messageList[0].scrollHeight;
+  }
+  // Listen for the form submit
+  $('.chat').on('submit',function(e) {
+    // stop the form from submitting
+    e.preventDefault();
+    // create a message object
+    var message = {
+      name : nameField.val()+" ( ID: "+session+" )",
+      text : messageField.val()
+    }
+    // Save Data to firebase
+    messagesRef.push(message);
+    // clear message field
+    messageField.val('');
+    loadImages();
+  });
+  function loadImages() {
+    for (var i = 0; i < 25; i++) {
+      document.getElementsByClassName("messages")[0].innerHTML=document.getElementsByClassName("messages")[0].innerHTML.replace("[[","<img width='500px' src='").replace("]]","'>");
+    }
+  }
+  // Add a callback that is triggered for each chat message
+  // this is kind of like an Ajax request, but they come in via websockets
+  // 10 of them will load on page load, and any future messages will as well
+  messagesRef.limitToLast(10).on('child_added', function (snapshot) {
+    // Get data from returned
+    addMessage(snapshot.val());
+  });
+loadImages()
+</script>
+<style>
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: #fff;
+  color: #333;
+  padding-left:20%;
+  padding-right:20%;
+  padding-top: 60px;
+}
+h1 {
+  font-size: 50;
+  font-weight: 400;
+}
+h2,h3,h4,h5,h6 {
+  font-weight: 400;
+}
+.wrapper {
+  max-width:700px;
+  margin: 0 auto;
+}
+hr {
+  border: 3px solid #1eae13;
+}
+a {
+  color: #1eae13;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+.chat {
+  margin: 0;
+}
+h1 {
+  text-align: center;
+}
+p.desc {
+  text-align: center;
+}
+input {
+  padding:20px;
+  margin-bottom: 10px;
+}
+input[type=submit] {
+  background: #1eae13;
+  color:white;
+  float:left;
+  transition: background .15s ease-in-out;
+  cursor: pointer; 
+  border: none;
+  font-size: 15px;
+  vertical-align: bottom;
+  padding-bottom: 12px;
+  padding-top: 12px;
+  
+}
+input[type=submit]:hover {
+  background: #145214;
+  transition: background .15s ease-in-out;
+}
+#nameInput {
+  width:20%;
+  float:left;
+  border: #eee ;
+  height: 20px;
+}
+#messageInput {
+  width:65%;
+  border-left: 0;
+  border-right: 0;
+  float:left;
+  border: none;
+  height: 20px;
+}
+.messages {
+  max-height:500px;
+  overflow:scroll;
+  background:white;
+  padding:20px;
+  position: relative;
+  font-size: 15;
+}
+.messagesWrap {
+  position: relative;
+  min-height: 100px;
+}
+.messagesWrap:before {
+  display: block;
+  z-index: 10;
+  content : '';
+  width: 100%;
+  height:100px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: linear-gradient(to bottom,  rgba(255,255,255,1) 0%,rgba(255,255,255,1) 20%,rgba(255,255,255,0) 97%,rgba(255,255,255,0) 100%); /* W3C */
+}
+.messages li {
+  padding-bottom: 10px;
+  margin:10px 0;
+  list-style: none;
+  border-left: 5px solid #1eae13;
+  padding-left: 15px;
+}
+#nav {
+  background: #1eae13;
+  top:0;
+  position: absolute;
+  left:0;
+  margin-top: 0;
+  color: #fff;
+  width: 100%;
+  font-size: 20px;
+}
+#nav li {
+  float: left;
+  color: #fff;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+#nav li:hover {
+  background: #145214;
+}
+.messages strong {
+  margin-right: 10px;
+  color: #1eae13;
+}
+li {
+  padding: 5px;
+  font-weight: 300;
+  list-style: none;
+}
+strong {
+  font-weight: 500;
+}
+.question {
+  border-left: 5px solid #1eae13;
+  padding-left: 15px;
+}
+footer {
+  background: #1eae13;
+  bottom: -70%;
+  position: absolute;
+  text-align: center;
+  height: 70px;
+  padding: 5px;
+  color: #fff;
+  width: 100%;
+  margin-left: -21%;
+}
+</style>
